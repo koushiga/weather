@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 const WeatherDetails = ({icon,temp,city,country,lat,log,humidity,wind}) =>{
@@ -58,6 +58,23 @@ function App() {
   const[cityNotFound,setCityNotFound]=useState(false);
   const[loading,setLoading]=useState(false);
 
+  const weatherIconMap = {
+    "01d":'./images/sun1.png',
+    "01n":'./images/sun1.png',
+    "02d":'./images/cloud1.webp',
+    "02n":'./images/cloud1.webp',
+    "03d":'./images/drizzle1.png',
+    "03n":'./images/drizzle1.png',
+    "04d":'./images/drizzle1.png',
+    "04n":'./images/drizzle1.png',
+    "09d":'./images/rain1.png',
+    "09n":'./images/rain1.png',
+    "10d":'./images/rain1.png',
+    "10n":'./images/rain1.png',
+    "13d":'./images/snow1.jpeg',
+    "13n":'./images/snow1.jpeg'
+  };
+
   const search = async()=>{
     let url=`https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${apiKey}&units=Metric`;
   
@@ -71,6 +88,17 @@ function App() {
         setLoading(false);
         return;
       }
+      setHumidity(data.main.humidity);
+      setWind(data.wind.speed);
+      setTemp(Math.floor(data.main.temp));
+      setCity(data.name);
+      setCountry(data.sys.country);
+      setLat(data.coord.lat);
+      setLog(data.coord.lon);
+
+      const weatherIconCode=data.weather[0].icon;
+      setIcon(weatherIconMap[weatherIconCode] || './images/sun1.png');
+      setCityNotFound(false);
     }catch(error){
         console.error("error your page",error.message);
     }finally{
@@ -86,7 +114,10 @@ function App() {
     if(e.key==="Enter"){
       search();
     }
-  }
+  };
+  useEffect(function(){
+    search();
+  },[]);
 
   return (
     <>
